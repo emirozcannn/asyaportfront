@@ -5,9 +5,10 @@ import { useEffect } from 'react';
 import { useAuthStore } from './stores/authStore';
 import { MainLayout } from './components/Layout/MainLayout';
 import { Login } from './pages/Login/Login';
-import { Dashboard } from './pages/Dashboard/Dashboard';
+import UserDashboard from './pages/Dashboard/UserDashboard';
 import { Assets } from './pages/Assets/Assets';
 import { Assignments } from './pages/Assignments/Assignments';
+import DepartmentAdminDashboard from './pages/Dashboard/DepartmentAdminDashboard';
 import './App.css';
 
 // Protected Route component
@@ -20,6 +21,18 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 const PublicRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated } = useAuthStore();
   return !isAuthenticated ? <>{children}</> : <Navigate to="/dashboard" replace />;
+};
+
+// Role-based Dashboard Component
+const RoleBasedDashboard: React.FC = () => {
+  const { user } = useAuthStore();
+  
+  // Rol kontrolü: Admin/ZimmetManager ise departman paneli, diğerleri user dashboard
+  if (user?.role === 'Admin' || user?.role === 'ZimmetManager') {
+    return <DepartmentAdminDashboard />;
+  }
+  
+  return <UserDashboard />;
 };
 
 function App() {
@@ -50,7 +63,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <MainLayout>
-                  <Dashboard />
+                  <RoleBasedDashboard />
                 </MainLayout>
               </ProtectedRoute>
             } 
@@ -78,6 +91,20 @@ function App() {
             } 
           />
 
+          {/* Sadece Admin ve ZimmetManager erişebilir */}
+          <Route 
+            path="/admin" 
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <AdminOnlyRoute>
+                    <DepartmentAdminDashboard />
+                  </AdminOnlyRoute>
+                </MainLayout>
+              </ProtectedRoute>
+            } 
+          />
+
           {/* Default redirect */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           
@@ -88,5 +115,16 @@ function App() {
     </ConfigProvider>
   );
 }
+
+// Admin/ZimmetManager Only Route component
+const AdminOnlyRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuthStore();
+  
+  if (user?.role === 'Admin' || user?.role === 'ZimmetManager') {
+    return <>{children}</>;
+  }
+  
+  return <Navigate to="/dashboard" replace />;
+};
 
 export default App;

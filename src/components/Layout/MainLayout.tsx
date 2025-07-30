@@ -10,31 +10,52 @@ interface MainLayoutProps {
   children: React.ReactNode;
 }
 
+
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout } = useAuthStore();
 
-  const menuItems = [
-    {
-      key: '/dashboard',
-      icon: <DashboardOutlined />,
-      label: 'Dashboard',
-      onClick: () => navigate('/dashboard')
-    },
-    {
-      key: '/assets',
-      icon: <ToolOutlined />,
-      label: 'Varlıklar',
-      onClick: () => navigate('/assets')
-    },
-    {
-      key: '/assignments',
-      icon: <FileTextOutlined />,
-      label: 'Zimmetler',
-      onClick: () => navigate('/assignments')
+  // Yetki kontrol fonksiyonu: HR ise tüm menüler, diğerleri departmanına göre
+  const getMenuItems = () => {
+    if (!user) return [];
+    const isHR = user.departmentName === 'İnsan Kaynakları' || user.departmentId === 'HR';
+    const isAdmin = user.role === 'Admin';
+    const isZimmetManager = user.role === 'ZimmetManager';
+
+    // Herkes dashboard görebilir
+    const items = [
+      {
+        key: '/dashboard',
+        icon: <DashboardOutlined />,
+        label: 'Dashboard',
+        onClick: () => navigate('/dashboard')
+      }
+    ];
+
+    // HR veya admin/zimmet yöneticisi ise varlık ve zimmet menüleri
+    if (isHR || isAdmin || isZimmetManager) {
+      items.push({
+        key: '/assets',
+        icon: <ToolOutlined />,
+        label: 'Varlıklar',
+        onClick: () => navigate('/assets')
+      });
+      items.push({
+        key: '/assignments',
+        icon: <FileTextOutlined />,
+        label: 'Zimmetler',
+        onClick: () => navigate('/assignments')
+      });
     }
-  ];
+
+    // Diğer departmanlar için ek menü kuralları burada eklenebilir
+    // Örneğin, sadece belirli kategorilere erişim vs.
+
+    return items;
+  };
+
+  const menuItems = getMenuItems();
 
   const userMenuItems = [
     {

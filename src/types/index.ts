@@ -1,13 +1,19 @@
 // User types
+// User tablosu (doğrudan alanlar)
 export interface User {
   id: string;
   employeeNumber: string;
   firstName: string;
   lastName: string;
   email: string;
-  role: string;
-  fullName: string;
-  departmentName: string;
+  passwordHash?: string; // opsiyonel, backendde tutulur
+  departmentId: string;
+  role: 'Admin' | 'ZimmetManager' | 'Employee';
+  isActive: boolean;
+  createdAt: string;
+  // İlişkisel alanlar (opsiyonel, view/join ile gelir)
+  departmentName?: string;
+  fullName?: string;
 }
 
 // API Response type
@@ -32,31 +38,42 @@ export interface LoginResponse {
 }
 
 // Asset types
+// Asset tablosu (doğrudan alanlar)
 export interface Asset {
   id: string;
   assetNumber: string;
   name: string;
   serialNumber?: string;
-  status: string;
+  categoryId: string;
+  status: 'Available' | 'Assigned' | 'Damaged';
   qrCode: string;
-  categoryName: string;
+  createdBy: string;
+  createdAt: string;
+  // İlişkisel alanlar (opsiyonel, view/join ile gelir)
+  categoryName?: string;
   assignedToName?: string;
   assignedToEmployee?: string;
-  createdAt: string;
+  creatorName?: string;
 }
 
 // Assignment types
+// Assignment tablosu (doğrudan alanlar)
 export interface Assignment {
   id: string;
   assignmentNumber: string;
-  assetName: string;
-  assetNumber: string;
-  assignedToName: string;
-  assignedByName: string;
+  assetId: string;
+  assignedToId: string;
+  assignedById: string;
   assignmentDate: string;
   returnDate?: string;
-  status: string;
+  status: 'Active' | 'Returned';
   notes?: string;
+  createdAt: string;
+  // İlişkisel alanlar (opsiyonel, view/join ile gelir)
+  assetName?: string;
+  assetNumber?: string;
+  assignedToName?: string;
+  assignedByName?: string;
 }
 
 // Asset Category type
