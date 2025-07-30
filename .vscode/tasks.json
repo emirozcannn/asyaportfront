@@ -1,0 +1,12 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Install all required npm packages",
+			"command": "npm install react-router-dom antd @ant-design/icons",
+			"group": "build",
+			"problemMatcher": []
+		}
+	]
+}
